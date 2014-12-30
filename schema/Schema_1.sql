@@ -1,0 +1,147 @@
+/*
+The Plan
+Create initial tables
+*/
+--Create the database
+CREATE database the_plan default charset=utf8
+
+--User table
+CREATE TABLE User(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	Username VARCHAR(30) NOT NULL,
+	Password VARCHAR(50) NOT NULL,
+	LastLoginDate DATETIME NULL,
+	PasswordExpired BIT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--Dates table
+CREATE TABLE Dates(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	UserId INT NOT NULL,
+	DateOfEntry DATETIME NOT NULL,
+	FOREIGN KEY (UserId) REFERENCES User(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+--DailyObjective table
+CREATE TABLE DailyObjective(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	DateId INT NOT NULL,
+	ObjectiveType VARCHAR(30) NOT NULL,
+	ReferenceId INT NOT NULL,
+	Complete TINYINT(1) NOT NULL DEFAULT 0,
+	PointsAssigned TINYINT(1) NOT NULL DEFAULT 0,
+	FOREIGN KEY (DateId) REFERENCES Dates(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+--DailyTodo table
+CREATE TABLE DailyTodo(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	DateId INT NOT NULL,
+	Name VARCHAR(40) NOT NULL,
+	Description VARCHAR(250) NOT NULL,
+	FOREIGN KEY (DateId) REFERENCES Dates(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+--Exercise table
+CREATE TABLE Exercise(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,	
+	Name VARCHAR(100) NOT NULL,
+	Description TEXT NOT NULL	
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--ExerciseLog table
+CREATE TABLE ExerciseLog(
+        LogId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	DateId INT NOT NULL,
+	ExerciseId INT NOT NULL,
+        Sets INT NOT NULL,
+        Reps INT NOT NULL,
+        WeightKg DECIMAL(8,2),
+	FOREIGN KEY (DateId) REFERENCES Dates(Id),
+	FOREIGN KEY (ExerciseId) REFERENCES Exercise(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--MuscleGroup table
+CREATE TABLE MuscleGroup(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,	
+	Name VARCHAR(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--Muscle table
+CREATE TABLE Muscle(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        MuscleGroupId INT NOT NULL,
+	Name VARCHAR(50) NOT NULL,
+        FOREIGN KEY (MuscleGroupId) REFERENCES MuscleGroup(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--MuscleWorked table
+CREATE TABLE MuscleWorked(	
+	ExerciseId INT NOT NULL,
+	MuscleId INT NOT NULL,
+        IsSecondary BIT NULL,
+        PRIMARY KEY (ExerciseId, MuscleId),
+	FOREIGN KEY (ExerciseId) REFERENCES Exercise(Id),		
+	FOREIGN KEY (MuscleId) REFERENCES Muscle(Id)		
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--Injury table
+CREATE TABLE Injury(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	UserId INT NOT NULL,
+	StartDate DATETIME NOT NULL,
+	EndDate DATETIME NULL,
+	Name VARCHAR(50) NOT NULL,
+	Description VARCHAR(250) NOT NULL,
+	AffectedBodyPart VARCHAR(50) NULL,
+	Severity INT NOT NULL DEFAULT 0,
+	FOREIGN KEY (UserId) REFERENCES User(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/* Measurements Table */
+CREATE TABLE Measurements(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,	
+	Name VARCHAR(50) NOT NULL	
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/* BodyComposition table */
+CREATE TABLE BodyComposition(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	DateId INT NOT NULL,
+	MeasurementId INT NOT NULL,
+	Measurement DECIMAL(5,2),
+	FOREIGN KEY (DateId) REFERENCES Dates(Id),
+	FOREIGN KEY (MeasurementId) REFERENCES Measurements(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/* Food table */
+CREATE TABLE Food(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	DateId INT NOT NULL,
+	TotalFat_g INT NULL,
+	SatFat_g INT NULL,
+	PolyunsatFat_g INT NULL,
+	MonounsatFat_g INT NULL,
+	TransFat_g INT NULL,
+	Cholestorol_mg INT NULL,
+	Sodium_mg INT NULL,
+	Potassium_mg INT NULL,
+	TotalCarbs_g INT NULL,
+	DietaryFiber_g INT NULL,
+	Sugars_g INT NULL,
+	Protein_g INT NULL,
+	VitaminA INT NULL,
+	VitaminC INT NULL,
+	Calcium INT NULL,
+	Iron INT NULL,
+	FOREIGN KEY (DateId) REFERENCES Dates(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/* Supplements table */
+CREATE TABLE Supplements(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	DateId INT NOT NULL,
+	Name VARCHAR(50) NOT NULL,
+	Description VARCHAR(250) NOT NULL,
+	FOREIGN KEY (DateId) REFERENCES Dates(Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
